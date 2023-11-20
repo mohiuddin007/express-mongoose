@@ -1,3 +1,4 @@
+import { Model } from "mongoose";
 
 export type TGuardian = {
   fatherName: string;
@@ -9,17 +10,17 @@ export type TGuardian = {
 };
 
 export type TUserName = {
-    firstName: string;
-    middleName: string;
-    lastName: string;
-}
+  firstName: string;
+  middleName: string;
+  lastName: string;
+};
 
 export type TLocalGuardian = {
-    name: string;
-    occupation: string;
-    contactNo: string;
-    address: string;
-}
+  name: string;
+  occupation: string;
+  contactNo: string;
+  address: string;
+};
 
 export type TStudent = {
   id: string;
@@ -35,5 +36,15 @@ export type TStudent = {
   guardian: TGuardian;
   localGuardian: TLocalGuardian;
   profileImg?: string;
-  isActive: 'active' | 'inActive';
+  isActive: "active" | "inActive";
 };
+
+export type StudentMethods = {
+  isUserExists(id: string): Promise<TStudent | null>;
+};
+
+export type StudentModel = Model<
+  TStudent,
+  Record<string, never>,
+  StudentMethods
+>;

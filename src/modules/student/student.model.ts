@@ -1,6 +1,8 @@
 import { Schema, model } from "mongoose";
 import validator from 'validator';
 import {
+  StudentMethods,
+  StudentModel,
   TGuardian,
   TLocalGuardian,
   TStudent,
@@ -13,13 +15,13 @@ const userNameSchema = new Schema<TUserName>({
     required: [true, "First Name is required"],
     trim: true,
     maxlength: [20, "Max allowed length 25 characters"],
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-        return firstNameStr === value;
-      },
-      message: '{VALUE} is not in capitalize format'
-    }
+    // validate: {
+    //   validator: function (value: string) {
+    //     const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    //     return firstNameStr === value;
+    //   },
+    //   message: '{VALUE} is not in capitalize format'
+    // }
   },
   middleName: {
     type: String,
@@ -30,10 +32,6 @@ const userNameSchema = new Schema<TUserName>({
     type: String,
     trim: true,
     required: [true, "Last Name is required"],
-    validate: {
-      validator: (value: string) => validator.isAlpha(value),
-      message: "{VALUE} is not valid"
-    }
   },
 });
 
@@ -93,7 +91,7 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
   },
 });
 
-const studentSchema = new Schema<TStudent>({
+const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
   id: {
     type: String,
     required: [true, "First Name is required"],
@@ -120,10 +118,6 @@ const studentSchema = new Schema<TStudent>({
     trim: true,
     required: [true, "Email is required"],
     unique: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email type'
-    }
   },
   contactNo: {
     trim: true,
@@ -172,4 +166,9 @@ const studentSchema = new Schema<TStudent>({
   profileImg: String,
 });
 
-export const StudentModel = model<TStudent>("Student", studentSchema);
+studentSchema.methods.isUserExists = async function (id: string) {
+  const existingUser = await Student.findOne({id: id});
+  return existingUser;
+}
+
+export const Student = model<TStudent, StudentModel>("Student", studentSchema);
