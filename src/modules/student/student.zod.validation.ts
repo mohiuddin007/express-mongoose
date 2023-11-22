@@ -28,6 +28,7 @@ const localGuardianSchema = z.object({
 
 const studentSchemaZod = z.object({
   id: z.string().min(1),
+  password: z.string().max(20),
   name: userNameSchema,
   gender: z.enum(['male', 'female']),
   dateOfBirth: z.string(),
@@ -41,6 +42,7 @@ const studentSchemaZod = z.object({
   localGuardian: localGuardianSchema,
   isActive: z.enum(['active', 'inActive']).default('active'),
   profileImg: z.string().optional(),
+  isDeleted: z.boolean().default(false),
 });
 
 export { studentSchemaZod };
