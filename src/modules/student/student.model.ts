@@ -101,10 +101,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       trim: true,
       unique: true,
     },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-      maxlength: [20, "Password can not be more than 20 characters"],
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id is required'],
+      unique: true,
+      ref: 'User'
     },
     name: {
       type: userNameSchema,
@@ -166,12 +167,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       trim: true,
       required: [true, "Local Guardian is required"],
     },
-    isActive: {
-      type: String,
-      enum: ["active", "inActive"],
-      trim: true,
-      default: "active",
-    },
     profileImg: String,
     isDeleted: {
       type: Boolean,
@@ -186,30 +181,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 );
 
 //virtual
-
 studentSchema.virtual("fullName").get(function () {
   return (
     this.name.firstName + " " + this.name.middleName + " " + this.name.lastName
   );
-});
-
-//pre save middleware / hook
-studentSchema.pre("save", async function (next) {
-  // console.log(this, 'pre hook: we will save the data');
-  const user = this;
-  //hashing password and save into db
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds)
-  );
-  next();
-});
-
-//post save middleware
-studentSchema.post("save", function (doc, next) {
-  // console.log(this, "post hook: we saved our data");
-  doc.password = "";
-  next();
 });
 
 //query middleware
@@ -233,11 +208,5 @@ studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
 };
-
-//creating a custom instance method
-// studentSchema.methods.isUserExists = async function (id: string) {
-//   const existingUser = await Student.findOne({ id: id });
-//   return existingUser;
-// };
 
 export const Student = model<TStudent, StudentModel>("Student", studentSchema);
