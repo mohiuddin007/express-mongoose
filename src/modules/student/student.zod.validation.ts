@@ -47,4 +47,4 @@ const createStudentValidationSchemaZod = z.object({
   })
 });
 
-export { createStudentValidationSchemaZod };
+export default createStudentValidationSchemaZod;
