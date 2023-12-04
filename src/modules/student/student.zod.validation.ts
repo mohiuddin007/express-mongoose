@@ -47,4 +47,53 @@ const createStudentValidationSchemaZod = z.object({
   })
 });
 
-export default createStudentValidationSchemaZod;
+const updateUserNameValidationSchema = z.object({
+  firstName: z.string().min(1).max(20).refine(value => /^[A-Z][a-z]*$/.test(value), {
+    message: "First Name must start with an uppercase letter and the rest should be lowercase letters",
+  }).optional(),
+  middleName: z.string().min(1).optional(),
+  lastName: z.string().min(1).refine(value => /^[A-Za-z]+$/.test(value), {
+    message: "Last Name must only contain alphabetical characters",
+  }).optional(),
+});
+
+const updateGuardianValidationSchema = z.object({
+  fatherName: z.string().min(1).optional(),
+  motherName: z.string().min(1).optional(),
+  fatherOccupation: z.string().min(1).optional(),
+  fatherContactNo: z.string().min(1).optional(),
+  motherContactNo: z.string().min(1).optional(),
+  motherOccupation: z.string().min(1).optional(),
+});
+
+const updateLocalGuardianValidationSchema = z.object({
+  name: z.string().min(1).optional(),
+  occupation: z.string().min(1).optional(),
+  contactNo: z.string().min(1).optional(),
+  address: z.string().min(1).optional(),
+});
+
+const updateStudentValidationSchemaZod = z.object({
+  body: z.object({
+    student: z.object({
+      name: updateUserNameValidationSchema.optional(),
+      gender: z.enum(['male', 'female']).optional(),
+      dateOfBirth: z.string().optional().optional(),
+      email: z.string().min(1).email().optional(),
+      contactNo: z.string().min(1).optional(),
+      emergencyContactNo: z.string().min(1).optional(),
+      bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
+      presentAddress: z.string().min(1).optional(),
+      permanentAddress: z.string().min(1).optional(),
+      guardian: updateGuardianValidationSchema.optional(),
+      localGuardian: updateLocalGuardianValidationSchema.optional(),
+      admissionSemester: z.string().optional(),
+      profileImg: z.string().optional(),
+    })
+  })
+});
+
+export const StudentValidations = {
+  createStudentValidationSchemaZod,
+  updateStudentValidationSchemaZod
+} ;
