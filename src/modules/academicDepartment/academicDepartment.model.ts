@@ -3,17 +3,22 @@ import { TAcademicDepartment } from "./academicDepartment.interface";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 
-const academicDepartmentSchema = new Schema<TAcademicDepartment>({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
+const academicDepartmentSchema = new Schema<TAcademicDepartment>(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: "AcademicFaculty",
+    },
   },
-  academicFaculty: {
-    type: Schema.Types.ObjectId,
-    ref: "AcademicFaculty",
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 academicDepartmentSchema.pre("save", async function (next) {
   const isDepartmentExist = await AcademicDepartment.findOne({

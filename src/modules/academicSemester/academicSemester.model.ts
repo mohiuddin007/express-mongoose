@@ -32,6 +32,8 @@ const academicSemesterSchema = new Schema<TAcademicSemester>({
     enum: monthsArr,
     required: true,
   },
+}, {
+  timestamps: true,
 });
 
 academicSemesterSchema.pre('save', async function(next) {
