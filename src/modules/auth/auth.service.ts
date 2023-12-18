@@ -37,7 +37,7 @@ const loginUser = async (payload: TLoginUser) => {
 
   //create token and send to the user
   const accessToken = jwt.sign(jwtPayload, config.jwt_secret_key as string, {
-    expiresIn: "10",
+    expiresIn: "10d",
   });
 
   return {
