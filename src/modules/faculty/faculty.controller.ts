@@ -1,16 +1,16 @@
-import httpStatus from 'http-status';
-import catchAsync from '../../utils/catchAsync';
-import sendResponse from '../../utils/sendResponse';
-import { FacultyServices } from './faculty.service';
+import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { FacultyServices } from "./faculty.service";
 
 const getSingleFaculty = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await FacultyServices.getSingleFacultyFromDB( id );
+  const result = await FacultyServices.getSingleFacultyFromDB(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculty is retrieved succesfully',
+    message: "Faculty is retrieved succesfully",
     data: result,
   });
 });
@@ -21,7 +21,7 @@ const getAllFaculties = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculties are retrieved succesfully',
+    message: "Faculties are retrieved succesfully",
     data: result,
   });
 });
@@ -29,24 +29,24 @@ const getAllFaculties = catchAsync(async (req, res) => {
 const updateFaculty = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { faculty } = req.body;
-  const result = await FacultyServices.updateFacultyIntoDB( id , faculty);
+  const result = await FacultyServices.updateFacultyIntoDB(id, faculty);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculty is updated succesfully',
+    message: "Faculty is updated succesfully",
     data: result,
   });
 });
 
 const deleteFaculty = catchAsync(async (req, res) => {
-  const {  id } = req.params;
+  const { id } = req.params;
   const result = await FacultyServices.deleteFacultyFromDB(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculty is deleted succesfully',
+    message: "Faculty is deleted succesfully",
     data: result,
   });
 });
