@@ -105,7 +105,6 @@ const changePassword = async (
 };
 
 const refreshToken = async (token: string) => {
-
   //check if the token is valid
   const decoded = jwt.verify(
     token,
@@ -151,13 +150,47 @@ const refreshToken = async (token: string) => {
   );
 
   return {
-    accessToken
+    accessToken,
+  };
+};
+
+const forgetPassword = async (userId: string) => {
+  const user = await User.isUserExistsByCustomId(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
   }
 
+  //checking if the user is already deleted
+  const isUserDeleted = user.isDeleted;
+  if (isUserDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, "This user is deleted!");
+  }
+
+  //checking if the user is already deleted
+  const userStatus = user.status;
+  if (userStatus === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  //create access token, refresh token and send to the user
+  const resetToken = createToken(
+    jwtPayload,
+    config.jwt_secret_key as string,
+    "10m"
+  );
+
+  const resetUrlLink = `http://localhost:3000?id=${user.id}&token=${resetToken}`;
+  return resetUrlLink;
 };
 
 export const AuthServices = {
   loginUser,
   changePassword,
   refreshToken,
+  forgetPassword,
 };

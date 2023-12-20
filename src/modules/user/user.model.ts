@@ -10,6 +10,11 @@ const userSchema = new Schema<TUser, UserModel>(
       trim: true,
       unique: true,
     },
+    email: {
+      type: String,
+      trim: true,
+      unique: true,
+    },
     password: {
       type: String,
       required: [true, "Password is required"],
