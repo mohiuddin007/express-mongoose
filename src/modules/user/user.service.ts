@@ -18,6 +18,8 @@ import { AcademicDepartment } from "../academicDepartment/academicDepartment.mod
 import { TAdmin } from "../admin/admin.interface";
 import { Admin } from "../admin/admin.model";
 import { TAcademicSemester } from "../academicSemester/academicSemester.interface";
+import { verifyToken } from "../auth/auth.utils";
+import { USER_ROLE } from "./user.constant";
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   //create a user object
@@ -40,7 +42,9 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   try {
     session.startTransaction();
     //set  generated id
-    userData.id = await generateStudentId(admissionSemester as TAcademicSemester);
+    userData.id = await generateStudentId(
+      admissionSemester as TAcademicSemester
+    );
     //create a user (transaction-1)
     const newUser = await User.create([userData], { session }); //build in static method
 
@@ -154,8 +158,25 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMeFromDB = async (userId: string, role: string) => {
+  let result = null;
+  if (role === USER_ROLE.student) {
+    result = await Student.findOne({ id: userId }).populate('user');
+  }
+  if (role === USER_ROLE.admin) {
+    result = await Admin.findOne({ id: userId }).populate('user');
+  }
+
+  if (role === USER_ROLE.faculty) {
+    result = await Faculty.findOne({ id: userId }).populate('user');
+  }
+
+  return result;
+};
+
 export const UserService = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  getMeFromDB,
 };

@@ -2,6 +2,7 @@ import { UserService } from "./user.service";
 import httpStatus from "http-status";
 import sendResponse from "../../utils/sendResponse";
 import catchAsync from "../../utils/catchAsync";
+import AppError from "../../errors/AppError";
 
 const createStudent = catchAsync(async (req, res, next) => {
   const { password, student: studentData } = req.body;
@@ -40,8 +41,21 @@ const createAdmin = catchAsync(async (req, res, next) => {
   });
 });
 
+const getMe = catchAsync(async (req, res, next) => {
+  const { userId, role } = req?.user;
+  const result = await UserService.getMeFromDB(userId, role);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Data retrieved successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createStudent,
   createFaculty,
-  createAdmin
+  createAdmin,
+  getMe,
 };

@@ -5,7 +5,7 @@ import { User } from "../user/user.model";
 import { TChangePassword, TLoginUser, TResetPassword } from "./auth.interface";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
-import { createToken } from "./auth.utils";
+import { createToken, verifyToken } from "./auth.utils";
 import { sendEmail } from "../../utils/sendEmail";
 
 const loginUser = async (payload: TLoginUser) => {
@@ -107,10 +107,7 @@ const changePassword = async (
 
 const refreshToken = async (token: string) => {
   //check if the token is valid
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string
-  ) as JwtPayload;
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
   const { userId, iat } = decoded;
 
   //checking if the user is exist
@@ -208,18 +205,15 @@ const resetPassword = async (payload: TResetPassword, token: string) => {
     throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
   }
 
-  const decoded = jwt.verify(
-    token,
-    config.jwt_secret_key as string
-  ) as JwtPayload;
+  const decoded = verifyToken(token, config.jwt_secret_key as string)
   const { userId, role, iat } = decoded;
 
   if (payload?.id != userId) {
     throw new AppError(httpStatus.FORBIDDEN, "You are forbidden!");
   }
 
-   //hash new password
-   const newHashedPassword = await bcrypt.hash(
+  //hash new password
+  const newHashedPassword = await bcrypt.hash(
     payload?.newPassword,
     Number(config?.bcrypt_salt_rounds as string)
   );
@@ -235,7 +229,6 @@ const resetPassword = async (payload: TResetPassword, token: string) => {
       passwordChangedAt: new Date(),
     }
   );
-
 };
 
 export const AuthServices = {
