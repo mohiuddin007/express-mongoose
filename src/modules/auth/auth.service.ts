@@ -2,10 +2,11 @@ import bcrypt from "bcrypt";
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
-import { TChangePassword, TLoginUser } from "./auth.interface";
+import { TChangePassword, TLoginUser, TResetPassword } from "./auth.interface";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 import { createToken } from "./auth.utils";
+import { sendEmail } from "../../utils/sendEmail";
 
 const loginUser = async (payload: TLoginUser) => {
   //checking if the user is exist
@@ -184,8 +185,34 @@ const forgetPassword = async (userId: string) => {
     "10m"
   );
 
-  const resetUrlLink = `http://localhost:3000?id=${user.id}&token=${resetToken}`;
-  return resetUrlLink;
+  const resetUrlLink = `${config.reset_password_ui_link}?id=${user.id}&token=${resetToken}`;
+
+  sendEmail(user.email, resetUrlLink);
+};
+
+const resetPassword = async (payload: TResetPassword, token: string) => {
+  const user = await User.isUserExistsByCustomId(payload.id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
+  }
+
+  //checking if the user is already deleted
+  const isUserDeleted = user.isDeleted;
+  if (isUserDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, "This user is deleted!");
+  }
+
+  //checking if the user is already deleted
+  const userStatus = user.status;
+  if (userStatus === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
+  }
+
+  const decoded = jwt.verify(
+    token,
+    config.jwt_secret_key as string
+  ) as JwtPayload;
+  const { userId, iat } = decoded;
 };
 
 export const AuthServices = {
@@ -193,4 +220,5 @@ export const AuthServices = {
   changePassword,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };

@@ -28,9 +28,10 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
   //set student role
   userData.role = "student";
+  userData.email = payload?.email;
 
   //find academic semester info
-  const admissionSemester: TAcademicSemester = await AcademicSemester.findById(
+  const admissionSemester = await AcademicSemester.findById(
     payload.admissionSemester
   );
 
@@ -39,7 +40,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   try {
     session.startTransaction();
     //set  generated id
-    userData.id = await generateStudentId(admissionSemester);
+    userData.id = await generateStudentId(admissionSemester as TAcademicSemester);
     //create a user (transaction-1)
     const newUser = await User.create([userData], { session }); //build in static method
 
@@ -69,6 +70,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
   userData.role = "faculty";
+  userData.email = payload?.email;
 
   const academicDepartment = await AcademicDepartment.findById(
     payload.academicDepartment
@@ -113,6 +115,7 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
   userData.role = "admin";
+  userData.email = payload?.email;
 
   const academicDepartment = await AcademicDepartment.findById(
     payload.academicDepartment
