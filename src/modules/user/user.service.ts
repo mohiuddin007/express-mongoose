@@ -18,7 +18,6 @@ import { AcademicDepartment } from "../academicDepartment/academicDepartment.mod
 import { TAdmin } from "../admin/admin.interface";
 import { Admin } from "../admin/admin.model";
 import { TAcademicSemester } from "../academicSemester/academicSemester.interface";
-import { verifyToken } from "../auth/auth.utils";
 import { USER_ROLE } from "./user.constant";
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
@@ -45,6 +44,9 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     userData.id = await generateStudentId(
       admissionSemester as TAcademicSemester
     );
+
+    //send image to cloudinary
+
     //create a user (transaction-1)
     const newUser = await User.create([userData], { session }); //build in static method
 
