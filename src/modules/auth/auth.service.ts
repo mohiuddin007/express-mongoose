@@ -212,7 +212,30 @@ const resetPassword = async (payload: TResetPassword, token: string) => {
     token,
     config.jwt_secret_key as string
   ) as JwtPayload;
-  const { userId, iat } = decoded;
+  const { userId, role, iat } = decoded;
+
+  if (payload?.id != userId) {
+    throw new AppError(httpStatus.FORBIDDEN, "You are forbidden!");
+  }
+
+   //hash new password
+   const newHashedPassword = await bcrypt.hash(
+    payload?.newPassword,
+    Number(config?.bcrypt_salt_rounds as string)
+  );
+
+  await User.findOneAndUpdate(
+    {
+      id: userId,
+      role: role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    }
+  );
+
 };
 
 export const AuthServices = {
