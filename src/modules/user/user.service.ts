@@ -161,16 +161,21 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
 const getMeFromDB = async (userId: string, role: string) => {
   let result = null;
   if (role === USER_ROLE.student) {
-    result = await Student.findOne({ id: userId }).populate('user');
+    result = await Student.findOne({ id: userId }).populate("user");
   }
   if (role === USER_ROLE.admin) {
-    result = await Admin.findOne({ id: userId }).populate('user');
+    result = await Admin.findOne({ id: userId }).populate("user");
   }
 
   if (role === USER_ROLE.faculty) {
-    result = await Faculty.findOne({ id: userId }).populate('user');
+    result = await Faculty.findOne({ id: userId }).populate("user");
   }
 
+  return result;
+};
+
+const statusChangeIntoDB = async (id: string, payload: { status: string }) => {
+  const result = await User.findByIdAndUpdate(id, payload, { new: true });
   return result;
 };
 
@@ -179,4 +184,5 @@ export const UserService = {
   createFacultyIntoDB,
   createAdminIntoDB,
   getMeFromDB,
+  statusChangeIntoDB,
 };
